@@ -1,37 +1,69 @@
+import xml.etree.ElementTree as ET
+from ProcesoArchivo import ProcesadorArchivo
+from ListaMatriz import ListaMatrices
+
+
+def imprimirXML(ruta):
+    try:
+        tree = ET.parse(ruta)
+        root = tree.getroot()
+        return ET.tostring(root, encoding='unicode')
+    except Exception as e:
+        print(f"Error al leer el archivo XML: {e}")
+        return None
+
+
 def menu():
+    paco = ""
+    procesador = ProcesadorArchivo()
+
     while True:
-        print("Menu principal:")
+        print("\nMenu principal:")
+        print("-----------------------------------------------")
         print("     1. Cargar archivo")
         print("     2. Procesar archivo")
         print("     3. Escribir archivo salida")
         print("     4. Mostrar datos del estudiante")
         print("     5. Generar gráfica")
         print("     6. Salir")
+        print("------------------------------------------------")
         macaco = int(input("Escribe una opción:  "))
 
         if macaco == 1:
+            print("------------------------------------------------")
             paco = input("Ingrese la ruta del archivo: ")
+            print(f"Ruta ingresada {paco}")
+            print("------------------------------------------------")
         elif macaco == 2:
-            pass
+            print("------------------------------------------------")
+            if paco:
+                contenido_xml = imprimirXML(paco)
+                if contenido_xml:
+                    procesador.procesar_archivo(contenido_xml)
+                    procesador.procesar_matrices()
+                    procesador.imprimir_matrices()
+            else:
+                print("Primero debe cargar un archivo.")
+            print("------------------------------------------------")
         elif macaco == 3:
-            pass
+            if procesador.lista_matrices.cabeza:
+                nombre_archivo = input("Ingrese el nombre del archivo de salida (incluyendo .xml): ")
+                procesador.escribir_archivo_salida(nombre_archivo)
+            else:
+                print("No hay matrices procesadas para escribir en el archivo de salida.")
         elif macaco == 4:
-            print(" ")
-            print("Ottoniel Fabricio Vásquez Pineda")
+            print("\nOttoniel Fabricio Vásquez Pineda")
             print("202307820")
             print("Introducción a la Programación y computación 2 sección B")
             print("Ingenieria en Ciencias y Sistemas")
             print("4to semestre")
-            print(" ")
         elif macaco == 5:
-            pass
+            pass  # Implementar la generación de gráficas
         elif macaco == 6:
-            print("Se salio del Menu")
+            print("Se salió del Menu")
             break
         else:
-            print("opción invalida")
-
-
+            print("Opción inválida")
 
 
 if __name__ == "__main__":
