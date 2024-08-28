@@ -1,8 +1,5 @@
 import xml.etree.ElementTree as ET
 from ProcesoArchivo import ProcesadorArchivo
-from ListaMatriz import ListaMatrices
-
-
 def imprimirXML(ruta):
     try:
         tree = ET.parse(ruta)
@@ -11,7 +8,6 @@ def imprimirXML(ruta):
     except Exception as e:
         print(f"Error al leer el archivo XML: {e}")
         return None
-
 
 def menu():
     paco = ""
@@ -41,22 +37,22 @@ def menu():
                 if contenido_xml:
                     procesador.procesar_archivo(contenido_xml)
                     procesador.procesar_matrices()
-                    procesador.imprimir_matrices()
             else:
                 print("Primero debe cargar un archivo.")
             print("------------------------------------------------")
         elif macaco == 3:
             if procesador.lista_matrices.cabeza:
-                nombre_archivo = input("Ingrese el nombre del archivo de salida (incluyendo .xml): ")
-                procesador.escribir_archivo_salida(nombre_archivo)
+                directorio = input("Ingrese la ruta del directorio donde desea guardar los archivos: ")
+                procesador.exportar_todas_matrices(directorio)
             else:
-                print("No hay matrices procesadas para escribir en el archivo de salida.")
+                print("No hay matrices procesadas para exportar.")
         elif macaco == 4:
             print("\nOttoniel Fabricio Vásquez Pineda")
             print("202307820")
             print("Introducción a la Programación y computación 2 sección B")
             print("Ingenieria en Ciencias y Sistemas")
             print("4to semestre")
+            print("https://github.com/Farot3/IPC2_Proyecto1_202307820")
         elif macaco == 5:
             pass  # Implementar la generación de gráficas
         elif macaco == 6:
