@@ -6,6 +6,7 @@ from ListaFila import ListaFilas
 from ListaDato import ListaDatos
 from ListaMatrizReducida import ListaMatrizReducida
 from ListasGrupo import ListaGrupos
+import webbrowser
 class ProcesadorArchivo:
     def __init__(self):
         self.lista_matrices = ListaMatrices()
@@ -53,7 +54,7 @@ class ProcesadorArchivo:
 
         matriz_actual = self.lista_matrices.cabeza
         while True:
-            print("------------------------------------------------")
+            print("\n------------------------------------------------")
             print(f"Calculando la matriz binaria: {matriz_actual.nombre} ....\n")
             patron_acceso = self.convertir_a_patron_acceso(matriz_actual)
             grupos = self.agrupar_tuplas(patron_acceso)
@@ -207,19 +208,44 @@ class ProcesadorArchivo:
         if not os.path.exists(directorio):
             os.makedirs(directorio)
 
+        nombre_archivo = input("Ingrese el nombre del archivo para todas las matrices (sin extensión): ")
+        nombre_archivo = f"{nombre_archivo}.xml"
+        ruta_completa = os.path.join(directorio, nombre_archivo)
+
+        doc = minidom.Document()
+        root = doc.createElement("matrices")
+        doc.appendChild(root)
+
         matriz_actual = self.lista_matrices.cabeza
         while True:
             if matriz_actual.matriz_reducida and matriz_actual.frecuencias:
-                nombre_archivo = input(
-                    f"Ingrese el nombre del archivo para la matriz '{matriz_actual.nombre}' (sin extensión): ")
-                nombre_archivo = f"{nombre_archivo}.xml"
-                ruta_completa = os.path.join(directorio, nombre_archivo)
-                self.escribir_archivo_salida(
-                    matriz_original=matriz_actual,
-                    matriz_reducida=matriz_actual.matriz_reducida,
-                    frecuencias=matriz_actual.frecuencias,
-                    ruta_completa=ruta_completa
-                )
+                matriz_elem = doc.createElement("matriz")
+                matriz_elem.setAttribute("nombre", f"{matriz_actual.nombre}_Salida")
+                matriz_elem.setAttribute("n", str(matriz_actual.matriz_reducida.filas))
+                matriz_elem.setAttribute("m", str(matriz_actual.matriz_reducida.columnas))
+                matriz_elem.setAttribute("g", str(matriz_actual.frecuencias.longitud()))
+
+                for i in range(matriz_actual.matriz_reducida.filas):
+                    for j in range(matriz_actual.matriz_reducida.columnas):
+                        dato_elem = doc.createElement("dato")
+                        dato_elem.setAttribute("x", str(i + 1))
+                        dato_elem.setAttribute("y", str(j + 1))
+                        dato_text = doc.createTextNode(str(matriz_actual.matriz_reducida.obtener_valor(i, j)))
+                        dato_elem.appendChild(dato_text)
+                        matriz_elem.appendChild(dato_elem)
+
+                freq_actual = matriz_actual.frecuencias.cabeza
+                g = 1
+                while freq_actual:
+                    freq_elem = doc.createElement("frecuencia")
+                    freq_elem.setAttribute("g", str(g))
+                    freq_text = doc.createTextNode(str(freq_actual.valor))
+                    freq_elem.appendChild(freq_text)
+                    matriz_elem.appendChild(freq_elem)
+                    freq_actual = freq_actual.siguiente
+                    g += 1
+
+                root.appendChild(matriz_elem)
             else:
                 print(f"La matriz '{matriz_actual.nombre}' no ha sido procesada y no se puede exportar.")
 
@@ -227,4 +253,71 @@ class ProcesadorArchivo:
             if matriz_actual == self.lista_matrices.cabeza:
                 break
 
-        print("Todas las matrices procesadas han sido exportadas.")
+        xml_str = doc.toprettyxml(indent="    ")
+        with open(ruta_completa, "w", encoding="utf-8") as f:
+            f.write(xml_str)
+        print("Se ha creado el archivo exitosamente.")
+
+    def graficar_matrices(self):
+        if not self.lista_matrices.cabeza:
+            print("No hay matrices para graficar.")
+            return
+
+        print("Matrices disponibles:")
+        matriz_actual = self.lista_matrices.cabeza
+        while True:
+            print(f"- {matriz_actual.nombre}")
+            matriz_actual = matriz_actual.siguiente
+            if matriz_actual == self.lista_matrices.cabeza:
+                break
+
+        nombre_matriz = input("Ingrese el nombre de la matriz que desea graficar: ")
+
+        matriz_seleccionada = self.lista_matrices.buscar_matriz(nombre_matriz)
+        if not matriz_seleccionada:
+            print(f"No se encontró ninguna matriz con el nombre '{nombre_matriz}'.")
+            return
+
+        self.generar_grafica(matriz_seleccionada)
+        #if matriz_seleccionada.matriz_reducida:
+        #    self.generar_grafica(matriz_seleccionada, "reducida")
+        #else:
+        #   print("La matriz reducida aún no ha sido calculada para esta matriz.")
+
+    def generar_grafica(self, matriz, Tipo):
+        graficar = "digraph G {\n"
+        graficar += "node[shape=ellipse]\n"
+        graficar += 'rankdir="TB"\n'
+        graficar += 'Matrizx [ shape=ellipse]\n'
+        graficar += f'{matriz.nombre} [shape=ellipse]\n'
+        graficar += f'Matriz -> {matriz.nombre}\n'
+
+        # Nodos para n y m
+        graficar += f'n_{matriz.nombre} [label="n= {matriz.n}", shape=ellipse]\n'
+        graficar += f'm_{matriz.nombre} [label="m= {matriz.m}", shape=ellipse]\n'
+        graficar += f'{matriz.nombre} -> n_{matriz.nombre}\n'
+        graficar += f'{matriz.nombre} -> m_{matriz.nombre}\n'
+
+        # Nodos para los valores de la matriz
+        for i in range(matriz.n):
+            for j in range(matriz.m):
+                valor = matriz.obtener_valor(i, j)
+                graficar += f'valor_{i}_{j} [label="{valor}", shape=ellipse]\n'
+                if j == 0:
+                    graficar += f'{matriz.nombre} -> valor_{i}_{j}\n'
+                else:
+                    graficar += f'valor_{i}_{j - 1} -> valor_{i}_{j}\n'
+
+        graficar += "}"
+
+        # Guardar y generar la gráfica
+        dot_file = f"matriz_{matriz.nombre}.dot"
+        pdf_file = f"matriz_{matriz.nombre}.pdf"
+
+        with open(dot_file, "w") as f:
+            f.write(graficar)
+
+        os.system(f"dot -Tpdf {dot_file} -o {pdf_file}")
+        webbrowser.open(pdf_file)
+
+        print(f"Se ha generado la gráfica de la matriz '{matriz.nombre}' en {pdf_file}")

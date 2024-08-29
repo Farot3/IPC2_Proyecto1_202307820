@@ -54,7 +54,7 @@ def menu():
             print("4to semestre")
             print("https://github.com/Farot3/IPC2_Proyecto1_202307820")
         elif macaco == 5:
-            pass  # Implementar la generación de gráficas
+            procesador.graficar_matrices()
         elif macaco == 6:
             print("Se salió del Menu")
             break
