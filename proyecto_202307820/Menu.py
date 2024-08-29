@@ -29,6 +29,7 @@ def menu():
             print("------------------------------------------------")
             paco = input("Ingrese la ruta del archivo: ")
             print(f"Ruta ingresada {paco}")
+            print(imprimirXML(paco))
             print("------------------------------------------------")
         elif macaco == 2:
             print("------------------------------------------------")
