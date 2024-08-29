@@ -1,0 +1,32 @@
+digraph G {
+node[shape=ellipse]
+rankdir="TB"
+MatrizReducida [shape=ellipse]
+TremendoReducida [shape=ellipse]
+MatrizReducida -> TremendoReducida
+n_Tremendo [label="n= 3", shape=ellipse]
+m_Tremendo [label="m= 4", shape=ellipse]
+TremendoReducida -> n_Tremendo
+TremendoReducida -> m_Tremendo
+{ rank=same; valor_0_0 [label="5", shape=ellipse]; valor_0_1 [label="7", shape=ellipse]; valor_0_2 [label="0", shape=ellipse]; valor_0_3 [label="6", shape=ellipse]; }
+{ rank=same; valor_1_0 [label="0", shape=ellipse]; valor_1_1 [label="0", shape=ellipse]; valor_1_2 [label="6", shape=ellipse]; valor_1_3 [label="3", shape=ellipse]; }
+{ rank=same; valor_2_0 [label="1", shape=ellipse]; valor_2_1 [label="0", shape=ellipse]; valor_2_2 [label="1", shape=ellipse]; valor_2_3 [label="5", shape=ellipse]; }
+TremendoReducida -> valor_0_0
+valor_0_0 -> valor_0_1
+valor_0_0 -> valor_1_0
+valor_0_1 -> valor_0_2
+valor_0_1 -> valor_1_1
+valor_0_2 -> valor_0_3
+valor_0_2 -> valor_1_2
+valor_0_3 -> valor_1_3
+valor_1_0 -> valor_1_1
+valor_1_0 -> valor_2_0
+valor_1_1 -> valor_1_2
+valor_1_1 -> valor_2_1
+valor_1_2 -> valor_1_3
+valor_1_2 -> valor_2_2
+valor_1_3 -> valor_2_3
+valor_2_0 -> valor_2_1
+valor_2_1 -> valor_2_2
+valor_2_2 -> valor_2_3
+}

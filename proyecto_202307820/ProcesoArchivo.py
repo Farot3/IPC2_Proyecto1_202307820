@@ -278,46 +278,98 @@ class ProcesadorArchivo:
             print(f"No se encontró ninguna matriz con el nombre '{nombre_matriz}'.")
             return
 
-        self.generar_grafica(matriz_seleccionada)
-        #if matriz_seleccionada.matriz_reducida:
-        #    self.generar_grafica(matriz_seleccionada, "reducida")
-        #else:
-        #   print("La matriz reducida aún no ha sido calculada para esta matriz.")
+        self.generar_grafica(matriz_seleccionada, "Original")
+        if matriz_seleccionada.matriz_reducida:
+            self.generar_grafica(matriz_seleccionada, "reducida")
+        else:
+           print("La matriz reducida aún no ha sido calculada para esta matriz.")
 
     def generar_grafica(self, matriz, Tipo):
-        graficar = "digraph G {\n"
-        graficar += "node[shape=ellipse]\n"
-        graficar += 'rankdir="TB"\n'
-        graficar += 'Matrizx [ shape=ellipse]\n'
-        graficar += f'{matriz.nombre} [shape=ellipse]\n'
-        graficar += f'Matriz -> {matriz.nombre}\n'
 
-        # Nodos para n y m
-        graficar += f'n_{matriz.nombre} [label="n= {matriz.n}", shape=ellipse]\n'
-        graficar += f'm_{matriz.nombre} [label="m= {matriz.m}", shape=ellipse]\n'
-        graficar += f'{matriz.nombre} -> n_{matriz.nombre}\n'
-        graficar += f'{matriz.nombre} -> m_{matriz.nombre}\n'
+        if Tipo == "Original":
+            graficar = "digraph G {\n"
+            graficar += "node[shape=ellipse]\n"
+            graficar += 'rankdir="TB"\n'
+            graficar += 'MatrizOriginal [ shape=ellipse]\n'
+            graficar += f'{matriz.nombre} [shape=ellipse]\n'
+            graficar += f'MatrizOriginal -> {matriz.nombre}\n'
 
-        # Nodos para los valores de la matriz
-        for i in range(matriz.n):
-            for j in range(matriz.m):
-                valor = matriz.obtener_valor(i, j)
-                graficar += f'valor_{i}_{j} [label="{valor}", shape=ellipse]\n'
-                if j == 0:
-                    graficar += f'{matriz.nombre} -> valor_{i}_{j}\n'
-                else:
-                    graficar += f'valor_{i}_{j - 1} -> valor_{i}_{j}\n'
+            # Nodos para n y m
+            graficar += f'n_{matriz.nombre} [label="n= {matriz.n}", shape=ellipse]\n'
+            graficar += f'm_{matriz.nombre} [label="m= {matriz.m}", shape=ellipse]\n'
+            graficar += f'{matriz.nombre} -> n_{matriz.nombre}\n'
+            graficar += f'{matriz.nombre} -> m_{matriz.nombre}\n'
 
-        graficar += "}"
+            # Nodos para los valores de la matriz
+            for i in range(matriz.n):
+                for j in range(matriz.m):
+                    valor = matriz.obtener_valor(i, j)
+                    graficar += f'valor_{i}_{j} [label="{valor}", shape=ellipse]\n'
+                    if j == 0:
+                        graficar += f'{matriz.nombre} -> valor_{i}_{j}\n'
+                    else:
+                        graficar += f'valor_{i}_{j - 1} -> valor_{i}_{j}\n'
 
-        # Guardar y generar la gráfica
-        dot_file = f"matriz_{matriz.nombre}.dot"
-        pdf_file = f"matriz_{matriz.nombre}.pdf"
+            graficar += "}"
 
-        with open(dot_file, "w") as f:
-            f.write(graficar)
+            # Guardar y generar la gráfica
+            dot_file = f"matriz_{matriz.nombre}.dot"
+            pdf_file = f"matriz_{matriz.nombre}.pdf"
 
-        os.system(f"dot -Tpdf {dot_file} -o {pdf_file}")
-        webbrowser.open(pdf_file)
+            with open(dot_file, "w") as f:
+                f.write(graficar)
 
-        print(f"Se ha generado la gráfica de la matriz '{matriz.nombre}' en {pdf_file}")
+            os.system(f"dot -Tpdf {dot_file} -o {pdf_file}")
+            webbrowser.open(pdf_file)
+
+            print(f"Se ha generado la gráfica de la matriz '{matriz.nombre}' en {pdf_file}")
+
+        elif Tipo == "reducida":
+            if not matriz.matriz_reducida:
+                print(f"La matriz reducida para '{matriz.nombre}' aún no ha sido calculada.")
+                return
+
+            graficar = "digraph G {\n"
+            graficar += "node[shape=ellipse]\n"
+            graficar += 'rankdir="TB"\n'
+            graficar += 'MatrizReducida [shape=ellipse]\n'
+            graficar += f'{matriz.nombre}Reducida [shape=ellipse]\n'
+            graficar += f'MatrizReducida -> {matriz.nombre}Reducida\n'
+
+            # Nodos para n y m
+            graficar += f'n_{matriz.nombre} [label="n= {matriz.matriz_reducida.filas}", shape=ellipse]\n'
+            graficar += f'm_{matriz.nombre} [label="m= {matriz.matriz_reducida.columnas}", shape=ellipse]\n'
+            graficar += f'{matriz.nombre}Reducida -> n_{matriz.nombre}\n'
+            graficar += f'{matriz.nombre}Reducida -> m_{matriz.nombre}\n'
+
+            # Nodos para los valores de la matriz reducida
+            for i in range(matriz.matriz_reducida.filas):
+                graficar += "{ rank=same; "
+                for j in range(matriz.matriz_reducida.columnas):
+                    valor = matriz.matriz_reducida.obtener_valor(i, j)
+                    graficar += f'valor_{i}_{j} [label="{valor}", shape=ellipse]; '
+                graficar += "}\n"
+
+            # Conexiones entre nodos
+            for i in range(matriz.matriz_reducida.filas):
+                for j in range(matriz.matriz_reducida.columnas):
+                    if i == 0 and j == 0:
+                        graficar += f'{matriz.nombre}Reducida -> valor_{i}_{j}\n'
+                    if j < matriz.matriz_reducida.columnas - 1:
+                        graficar += f'valor_{i}_{j} -> valor_{i}_{j + 1}\n'
+                    if i < matriz.matriz_reducida.filas - 1:
+                        graficar += f'valor_{i}_{j} -> valor_{i + 1}_{j}\n'
+
+            graficar += "}"
+
+            # Guardar y generar la gráfica
+            dot_file = f"matriz_{matriz.nombre}_reducida.dot"
+            pdf_file = f"matriz_{matriz.nombre}_reducida.pdf"
+
+            with open(dot_file, "w") as f:
+                f.write(graficar)
+
+            os.system(f"dot -Tpdf {dot_file} -o {pdf_file}")
+            webbrowser.open(pdf_file)
+
+            print(f"Se ha generado la gráfica de la matriz reducida '{matriz.nombre}' en {pdf_file}")
