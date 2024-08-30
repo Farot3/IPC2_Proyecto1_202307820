@@ -321,8 +321,8 @@ class ProcesadorArchivo:
             graficar += f'MatrizOriginal -> {matriz.nombre}\n'
 
             # Nodos para n y m
-            graficar += f'n_{matriz.nombre} [label="n= {matriz.n}", shape=oval]\n'
-            graficar += f'm_{matriz.nombre} [label="m= {matriz.m}", shape=oval]\n'
+            graficar += f'n_{matriz.nombre} [label="n= {matriz.n}", shape=Msquare]\n'
+            graficar += f'm_{matriz.nombre} [label="m= {matriz.m}", shape=Msquare]\n'
             graficar += f'{matriz.nombre} -> n_{matriz.nombre}\n'
             graficar += f'{matriz.nombre} -> m_{matriz.nombre}\n'
 
@@ -363,8 +363,8 @@ class ProcesadorArchivo:
             graficar += f'MatrizReducida -> {matriz.nombre}Reducida\n'
 
             # Nodos para n y m
-            graficar += f'n_{matriz.nombre} [label="n= {matriz.matriz_reducida.filas}", shape=oval]\n'
-            graficar += f'm_{matriz.nombre} [label="m= {matriz.matriz_reducida.columnas}", shape=oval]\n'
+            graficar += f'n_{matriz.nombre} [label="n= {matriz.matriz_reducida.filas}", shape=Msquare]\n'
+            graficar += f'm_{matriz.nombre} [label="m= {matriz.matriz_reducida.columnas}", shape=Msquare]\n'
             graficar += f'{matriz.nombre}Reducida -> n_{matriz.nombre}\n'
             graficar += f'{matriz.nombre}Reducida -> m_{matriz.nombre}\n'
 
