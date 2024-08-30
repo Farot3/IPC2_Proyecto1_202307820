@@ -1,14 +1,17 @@
 from NodoMatrizReducida import NodoMatrizReducida
+
 class ListaMatrizReducida:
     def __init__(self):
-        self.cabeza = None
-        self.filas = 0
-        self.columnas = 0
+        # Inicializa una matriz reducida
+        self.cabeza = None  # Cabeza de la matriz
+        self.filas = 0  # Número de filas
+        self.columnas = 0  # Número de columnas
 
     def agregar_dato(self, x, y, valor):
+        # Agrega un nuevo punto de datos a la matriz reducida
         nuevo_nodo = NodoMatrizReducida(x, y, valor)
 
-        # Actualizar filas y columnas
+        # Actualiza el conteo de filas y columnas
         self.filas = max(self.filas, x + 1)
         self.columnas = max(self.columnas, y + 1)
 
@@ -33,6 +36,7 @@ class ListaMatrizReducida:
                 fila_actual.abajo = nuevo_nodo
 
     def obtener_valor(self, x, y):
+        # Obtiene el valor en la posición (x, y)
         fila_actual = self.cabeza
         while fila_actual and fila_actual.x < x:
             fila_actual = fila_actual.abajo
@@ -48,6 +52,7 @@ class ListaMatrizReducida:
         return 0
 
     def _ultima_fila(self):
+        # Obtiene la última fila de la matriz
         if not self.cabeza:
             return None
         fila_actual = self.cabeza
@@ -56,6 +61,7 @@ class ListaMatrizReducida:
         return fila_actual
 
     def imprimir(self):
+        # Imprime la matriz reducida
         for i in range(self.filas):
             for j in range(self.columnas):
                 print(f"{self.obtener_valor(i, j):4}", end=" ")

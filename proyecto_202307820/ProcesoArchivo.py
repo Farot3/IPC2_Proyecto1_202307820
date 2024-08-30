@@ -48,6 +48,12 @@ class ProcesadorArchivo:
             print(f"Error inesperado al procesar el archivo: {str(e)}")
 
     def procesar_matrices(self):
+        # Procesa todas las matrices en la lista
+        # Para cada matriz:
+        # 1. Convierte la matriz a un patrón de acceso binario
+        # 2. Agrupa las tuplas similares
+        # 3. Crea una matriz reducida basada en los grupos
+        # 4. Imprime los resultados
         if not self.lista_matrices.cabeza:
             print("No hay matrices para procesar.")
             return
@@ -74,6 +80,8 @@ class ProcesadorArchivo:
         print("Todas las matrices han sido procesadas.")
 
     def convertir_a_patron_acceso(self, matriz):
+        # Convierte una matriz a un patrón de acceso binario
+        # Si un valor en la matriz original es > 0, se convierte a 1, de lo contrario a 0
         patron = ListaFilas()
         for i in range(matriz.n):
             fila = patron.agregar_fila()
@@ -82,6 +90,8 @@ class ProcesadorArchivo:
         return patron
 
     def agrupar_tuplas(self, patron_acceso):
+        # Agrupa patrones similares en la matriz
+        # Crea grupos basados en patrones idénticos en las filas
         lista_grupos = ListaGrupos()
         fila_actual = patron_acceso.cabeza
         i = 0
@@ -113,6 +123,8 @@ class ProcesadorArchivo:
         return lista_grupos
 
     def lista_a_tupla(self, lista):
+        # Convierte una lista enlazada a una tupla
+        # Utilizado para crear identificadores únicos para los grupos
         resultado = ()
         dato_actual = lista.cabeza
         while dato_actual:
@@ -121,6 +133,9 @@ class ProcesadorArchivo:
         return resultado
 
     def crear_matriz_reducida(self, matriz_original, lista_grupos):
+        # Crea una matriz reducida basada en la matriz original y los grupos identificados
+        # Calcula las sumas de los valores en cada grupo
+        # También calcula las frecuencias de los grupos
         matriz_reducida = ListaMatrizReducida()
         frecuencias = ListaDatos()
 
@@ -145,6 +160,8 @@ class ProcesadorArchivo:
         return matriz_reducida, frecuencias
 
     def imprimir_matrices(self, matriz_original, matriz_reducida, frecuencias):
+        # Imprime la matriz original, la matriz reducida y las frecuencias de los grupos
+        # Proporciona una visualización de los resultados del procesamiento
         print(f"Matriz: {matriz_original.nombre}")
         print(f"Dimensiones originales: {matriz_original.n} x {matriz_original.m}")
         print("Matriz original:")
@@ -164,6 +181,8 @@ class ProcesadorArchivo:
             freq_actual = freq_actual.siguiente
 
     def escribir_archivo_salida(self, matriz_original, matriz_reducida, frecuencias, ruta_completa):
+        # Escribe los resultados del procesamiento (matriz reducida y frecuencias) a un archivo XML
+        # El archivo de salida tiene un formato específico que incluye los datos de la matriz y las frecuencias
         doc = minidom.Document()
 
         root = doc.createElement("matriz")
@@ -201,6 +220,8 @@ class ProcesadorArchivo:
         print(f"Archivo XML '{ruta_completa}' escrito exitosamente.")
 
     def exportar_todas_matrices(self, directorio):
+        # Exporta todas las matrices procesadas a un único archivo XML
+        # Crea un nuevo archivo que contiene todas las matrices reducidas y sus frecuencias
         if not self.lista_matrices.cabeza:
             print("No hay matrices para exportar.")
             return
@@ -259,6 +280,8 @@ class ProcesadorArchivo:
         print("Se ha creado el archivo exitosamente.")
 
     def graficar_matrices(self):
+        # Permite al usuario seleccionar una matriz para graficar
+        # Puede graficar tanto la matriz original como la reducida (si está disponible)
         if not self.lista_matrices.cabeza:
             print("No hay matrices para graficar.")
             return
@@ -285,18 +308,21 @@ class ProcesadorArchivo:
            print("La matriz reducida aún no ha sido calculada para esta matriz.")
 
     def generar_grafica(self, matriz, Tipo):
-
+        # Genera una representación gráfica de la matriz utilizando el lenguaje DOT
+        # Crea un archivo DOT y lo convierte a PDF
+        # Abre el PDF generado en el navegador web predeterminado
+        # Puede generar gráficos tanto para la matriz original como para la reducida
         if Tipo == "Original":
             graficar = "digraph G {\n"
-            graficar += "node[shape=ellipse]\n"
+            graficar += "node[shape=tripleoctagon]\n"
             graficar += 'rankdir="TB"\n'
-            graficar += 'MatrizOriginal [ shape=ellipse]\n'
-            graficar += f'{matriz.nombre} [shape=ellipse]\n'
+            graficar += 'MatrizOriginal [ shape=tripleoctagon]\n'
+            graficar += f'{matriz.nombre} [shape=doubleoctagon]\n'
             graficar += f'MatrizOriginal -> {matriz.nombre}\n'
 
             # Nodos para n y m
-            graficar += f'n_{matriz.nombre} [label="n= {matriz.n}", shape=ellipse]\n'
-            graficar += f'm_{matriz.nombre} [label="m= {matriz.m}", shape=ellipse]\n'
+            graficar += f'n_{matriz.nombre} [label="n= {matriz.n}", shape=oval]\n'
+            graficar += f'm_{matriz.nombre} [label="m= {matriz.m}", shape=oval]\n'
             graficar += f'{matriz.nombre} -> n_{matriz.nombre}\n'
             graficar += f'{matriz.nombre} -> m_{matriz.nombre}\n'
 
@@ -304,11 +330,11 @@ class ProcesadorArchivo:
             for i in range(matriz.n):
                 for j in range(matriz.m):
                     valor = matriz.obtener_valor(i, j)
-                    graficar += f'valor_{i}_{j} [label="{valor}", shape=ellipse]\n'
-                    if j == 0:
+                    graficar += f'valor_{i}_{j} [label="{valor}", shape=Mcircle]\n'
+                    if i == 0:
                         graficar += f'{matriz.nombre} -> valor_{i}_{j}\n'
                     else:
-                        graficar += f'valor_{i}_{j - 1} -> valor_{i}_{j}\n'
+                        graficar += f'valor_{i - 1}_{j} -> valor_{i}_{j}\n'
 
             graficar += "}"
 
@@ -330,15 +356,15 @@ class ProcesadorArchivo:
                 return
 
             graficar = "digraph G {\n"
-            graficar += "node[shape=ellipse]\n"
+            graficar += "node[shape=tripleoctagon]\n"
             graficar += 'rankdir="TB"\n'
-            graficar += 'MatrizReducida [shape=ellipse]\n'
-            graficar += f'{matriz.nombre}Reducida [shape=ellipse]\n'
-            graficar += f'MatrizReducida -> {matriz.nombre}\n'
+            graficar += 'MatrizReducida [shape=tripleoctagon]\n'
+            graficar += f'{matriz.nombre}Reducida [shape=doubleoctagon]\n'
+            graficar += f'MatrizReducida -> {matriz.nombre}Reducida\n'
 
             # Nodos para n y m
-            graficar += f'n_{matriz.nombre} [label="n= {matriz.matriz_reducida.filas}", shape=ellipse]\n'
-            graficar += f'm_{matriz.nombre} [label="m= {matriz.matriz_reducida.columnas}", shape=ellipse]\n'
+            graficar += f'n_{matriz.nombre} [label="n= {matriz.matriz_reducida.filas}", shape=oval]\n'
+            graficar += f'm_{matriz.nombre} [label="m= {matriz.matriz_reducida.columnas}", shape=oval]\n'
             graficar += f'{matriz.nombre}Reducida -> n_{matriz.nombre}\n'
             graficar += f'{matriz.nombre}Reducida -> m_{matriz.nombre}\n'
 
@@ -348,7 +374,7 @@ class ProcesadorArchivo:
                 for i in range(matriz.matriz_reducida.filas):
                     valor = matriz.matriz_reducida.obtener_valor(i, j)
                     node_name = f'valor_{j}_{i}'
-                    graficar += f'{node_name} [label="{valor}", shape=ellipse]\n'
+                    graficar += f'{node_name} [label="{valor}", shape=Mcircle]\n'
                     graficar += f'{prev_node} -> {node_name}\n'
                     prev_node = node_name
 

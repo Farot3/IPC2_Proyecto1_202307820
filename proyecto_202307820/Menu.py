@@ -23,13 +23,20 @@ def menu():
         print("     5. Generar gráfica")
         print("     6. Salir")
         print("------------------------------------------------")
-        macaco = int(input("Escribe una opción:  "))
+        try:
+            macaco = int(input("Escribe una opción del 1 al 6:  "))
+        except ValueError:
+            print("Error, no se aceptan otro caracteres que no sean números")
+            continue
 
         if macaco == 1:
             print("------------------------------------------------")
             paco = input("Ingrese la ruta del archivo: ")
-            print(f"Ruta ingresada {paco}")
-            print(imprimirXML(paco))
+            if paco.endswith(".xml"):
+                print(f"Ruta ingresada {paco}")
+            else:
+                print("Solo se aceptan archivos con extensión .xml")
+                paco = ""
             print("------------------------------------------------")
         elif macaco == 2:
             print("------------------------------------------------")
@@ -61,7 +68,6 @@ def menu():
             break
         else:
             print("Opción inválida")
-
 
 if __name__ == "__main__":
     menu()
